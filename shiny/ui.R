@@ -41,6 +41,7 @@ shinyUI(fluidPage(
                column(2,
                       wellPanel(
                         render_button(),
+                        hr(),
                         selectizeInput('date_coh', 'Choose Date Cohort', c('None', 'Year', 'Year-Month', 'Year-Month-Day'), multiple=FALSE),
                         selectizeInput('coh1', 'Cohort 1', cohort_selection, multiple=FALSE),
                         selectizeInput('coh2', 'Cohort 2', cohort_selection, multiple=FALSE),
