@@ -1,0 +1,16 @@
+#render {
+  
+  background-image: linear-gradient(to bottom, #08c, #04c);
+  background-color: #006dcc;
+  color: #fff;
+  font-family: "Calibri";
+  width: 100%;
+  display: -webkit-inline-box;
+  
+}
+
+.btn:hover, .btn:focus {
+  
+  background-position: 0px;
+  
+}

@@ -1,5 +1,5 @@
-shinyServer(function(input, output) {
-
+shinyServer(function(session, input, output) {
+  
   
   filter_table_data <- reactive({
     
@@ -17,8 +17,8 @@ shinyServer(function(input, output) {
     
     for(f in filter_id) {
       if(!'All' %in% input[[f]]) {
-          filter <- paste0('data_f <- filter(data_f, ', f, ' %in% c("', paste(input[[f]], collapse='","'), '"))')
-          eval(parse(text=filter))
+        filter <- paste0('data_f <- filter(data_f, ', f, ' %in% c("', paste(input[[f]], collapse='","'), '"))')
+        eval(parse(text=filter))
       }
       
     }  
@@ -102,75 +102,82 @@ shinyServer(function(input, output) {
   })
   
   output$table <- renderGvis({
-    data_final <- final_table_data()$data_final %>%
-      data.frame() %>%
-      format_numbers(name_list = c('avg_contribution', 'total_contribution', 'n', 'contribution_amount_dollars'),
-                     currency_list = c('avg_contribution', 'total_contribution', 'contribution_amount_dollars'), 
-                     percentage_list = c()
-      ) %>%
-      give_nice_names(nice_names)
-    gvisTable(data_final, options = list(page='enable', pageSize=30, bSort=FALSE), chartid = 'table')
+    input$render
     
+    isolate({
+      data_final <- final_table_data()$data_final %>%
+        data.frame() %>%
+        format_numbers(name_list = c('avg_contribution', 'total_contribution', 'n', 'contribution_amount_dollars'),
+                       currency_list = c('avg_contribution', 'total_contribution', 'contribution_amount_dollars'), 
+                       percentage_list = c()
+        ) %>%
+        give_nice_names(nice_names)
+      gvisTable(data_final, options = list(page='enable', pageSize=30, bSort=FALSE), chartid = 'table')
+    })
   })
   
   output$graph <- renderChart2({
+    input$render
     
-    validate(
-      need(input$date_coh != 'None', 'Need time cohort')
-    )
-    
-    validate(
-      need(input$aggregation == 'Aggregated', 'Only works on Aggregated level')
-    )
-    
-    data_final <- final_table_data()$data_final %>%
-      data.frame()
-    grouping_variables <- final_table_data()$grouping_variables
-    
-    last_filter_ind <- sum(names(data_final) %in% grouping_variables)
-    
-    if(last_filter_ind>1) {
-      from <- 2
-      data_final$cohorts_all <- apply(data_final[from:last_filter_ind], 1, paste, collapse="//")
+    isolate({
+      validate(
+        need(input$date_coh != 'None', 'Need time cohort')
+      )
       
-    } else {
-      data_final$cohorts_all <- 1
+      validate(
+        need(input$aggregation == 'Aggregated', 'Only works on Aggregated level')
+      )
       
-    }
-    
-    #data_final$cohorts_all <- apply(data_final[from:last_filter_ind], 1, paste, collapse="//")
-    
-    p <- Highcharts$new()
-    p$chart(type='line')
-    
-    p$xAxis(categories = sort(unique(data_final[,1])), tickInterval=2, title=list(text='Time'))
-    p$yAxis(title=list(text='Total Contribution'))
-    p$title(text='Graph')
-    p$legend(align = "right", verticalAlign = "right", layout = "vertical")
-    
-    
-    for(c in unique(data_final$cohorts_all)) {
+      data_final <- final_table_data()$data_final %>%
+        data.frame()
+      grouping_variables <- final_table_data()$grouping_variables
       
-      temp <- filter(data_final, cohorts_all==c) %>%
-        arrange_(names(data_final)[1])
+      last_filter_ind <- sum(names(data_final) %in% grouping_variables)
       
-      lines <- data_to_json(temp, col_to_json = c('total_contribution'), col_names = 'y') %>%
-        p$series(data=.,
-                 zIndex=1,
-                 name=c,
-                 marker=list(enabled=FALSE)
-        )
+      if(last_filter_ind>1) {
+        from <- 2
+        data_final$cohorts_all <- apply(data_final[from:last_filter_ind], 1, paste, collapse="//")
+        
+      } else {
+        data_final$cohorts_all <- 1
+        
+      }
       
-    }
-    return(p)
-    
+      #data_final$cohorts_all <- apply(data_final[from:last_filter_ind], 1, paste, collapse="//")
+      
+      p <- Highcharts$new()
+      p$chart(type='line')
+      
+      p$xAxis(categories = sort(unique(data_final[,1])), tickInterval=2, title=list(text='Time'))
+      p$yAxis(title=list(text='Total Contribution'))
+      p$title(text='Graph')
+      p$legend(align = "right", verticalAlign = "right", layout = "vertical")
+      
+      
+      for(c in unique(data_final$cohorts_all)) {
+        
+        temp <- filter(data_final, cohorts_all==c) %>%
+          arrange_(names(data_final)[1])
+        
+        lines <- data_to_json(temp, col_to_json = c('total_contribution'), col_names = 'y') %>%
+          p$series(data=.,
+                   zIndex=1,
+                   name=c,
+                   marker=list(enabled=FALSE)
+          )
+        
+      }
+      return(p)
+    })
     
   })
   
-  # Observer to control for widget selections
+  # Filter widget controls
   observe({
-    
-    
+    input_widget_control(session = session,
+                         input = input,
+                         vars = filter_id)
   })
+  
   
 })

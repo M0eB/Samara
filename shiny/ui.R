@@ -1,3 +1,4 @@
+options(rcharts.cdn = TRUE)
 shinyUI(fluidPage(
   
   tagList(
@@ -30,15 +31,16 @@ shinyUI(fluidPage(
                                        min = min(date), 
                                        max = max(date)),        
                         
-                         selectizeInput('party_name', 'Party Name', c('All', party_name), 'All', multiple=TRUE),
-                         selectizeInput('province', 'Province', c('All', province), 'All', multiple=TRUE),
-                         selectizeInput('city', 'City', c('All', city), 'All', multiple=TRUE),
-                         selectizeInput('flag.blank_contrib', 'Federal Contribution', c('All', flag.blank_contrib), 'All', multiple=TRUE),
-                         selectizeInput('target_riding', 'Riding', c('All', target_riding), 'All', multiple=TRUE)
+                         selectizeInput('party_name', 'Party Name', c('All', party_name), 'All', multiple=TRUE, options=list(plugins=list('remove_button'))),
+                         selectizeInput('province', 'Province', c('All', province), 'All', multiple=TRUE, options=list(plugins=list('remove_button'))),
+                         selectizeInput('city', 'City', c('All', city), 'All', multiple=TRUE, options=list(plugins=list('remove_button'))),
+                         selectizeInput('flag.blank_contrib', 'Federal Contribution', c('All', flag.blank_contrib), 'All', multiple=TRUE, options=list(plugins=list('remove_button'))),
+                         selectizeInput('target_riding', 'Riding', c('All', target_riding), 'All', multiple=TRUE, options=list(plugins=list('remove_button')))
                       )                      
                ),
                column(2,
                       wellPanel(
+                        render_button(),
                         selectizeInput('date_coh', 'Choose Date Cohort', c('None', 'Year', 'Year-Month', 'Year-Month-Day'), multiple=FALSE),
                         selectizeInput('coh1', 'Cohort 1', cohort_selection, multiple=FALSE),
                         selectizeInput('coh2', 'Cohort 2', cohort_selection, multiple=FALSE),

@@ -25,16 +25,18 @@ get_constants <- function(file_path, file_name, filter_id) {
     
     for(f in filters) {
       if(is.na(file.info(paste0("constants/",f))$mtime)) {
-        eval(parse(text=paste0(f, ' <- unique(' ,file_name , '[[\'', f, '\']])')))
+        eval(parse(text=paste0(f, ' <- sort(unique(' ,file_name , '[[\'', f, '\']]))')))
         env[[f]] <- eval(parse(text=f))
         save(list=f, file=paste0("constants/",f))
       }
     }
+    # Remove data file to avoid memory leak
+    eval(parse(text=paste0('rm(', file_name, ')')))
+    gc()
+    
   }
   
-  # Remove data file to avoid memory leak
-  eval(parse(text=paste0('rm(', file_name, ')')))
-  gc()
+
   
 }
 

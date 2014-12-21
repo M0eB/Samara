@@ -5,6 +5,8 @@ library(rCharts)
 source('helper_functions/format_numbers.R')
 source('helper_functions/give_nice_names.R')
 source('helper_functions/get_constants.R')
+source('helper_functions/input_widget_control.R')
+source('helper_functions/render_button.R')
 
 glob_env <- globalenv()
 
