@@ -1,8 +1,15 @@
 shinyServer(function(input, output) {
-  
-  
+
   
   filter_table_data <- reactive({
+    
+    if(is.null(glob_env[['data']])) {
+      load('data/data')    
+      glob_env[['data']] <- data
+      rm(data)
+      gc()
+      
+    }
     
     # Filter date
     data_f <- data[data$date >= as.character(input$date[1]) & data$date <= as.character(input$date[2]),]

@@ -2,10 +2,11 @@ library(googleVis)
 library(dplyr)
 library(rCharts)
 
-load('data/data')
-
 source('helper_functions/format_numbers.R')
 source('helper_functions/give_nice_names.R')
+source('helper_functions/get_constants.R')
+
+glob_env <- globalenv()
 
 nice_names <- list(party_name = 'Party Name',
                    province = 'Province',
@@ -31,6 +32,10 @@ cohort_id <- c('coh1', 'coh2', 'coh3', 'coh4')
 filter_id <- c("party_name", "province", "city", "flag.blank_contrib", "target_riding")
 
 dat_filter <- c('date_coh')
+
+get_constants(file_path = 'data/data',
+              file_name = 'data', 
+              filter_id = c("party_name", "province", "city", "flag.blank_contrib", "target_riding", 'date'))
 
 data_to_json <- function(data, col_to_json=NULL, col_names=NULL) {
   
